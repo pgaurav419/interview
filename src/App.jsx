@@ -11,7 +11,7 @@ function App() {
         <Routes>
           <Route path="/" element={<CountryList />} />
           <Route path="/state/:id" element={<StateList />} />
-          <Route path="/city?:id" element={<CityList />} />
+          <Route path="/city/:id" element={<CityList />} />
 
         </Routes>
       </BrowserRouter>

@@ -1,61 +1,84 @@
 import React, { useState } from "react"
 import { useNavigate } from 'react-router-dom'
 
-
 const CountryList = () => {
     const navigate = useNavigate();
-    const [isCountryValue, setIsCountryValue] = useState("")
-    const [isCountryList, setIsCountryList] = useState([])
+    const [countryName, setCountryName] = useState("")
+    const [countryList, setCountryList] = useState([])
     const [isFormOpen, setIsFormOpen] = useState(false)
 
     const handleAddCountry = (e) => {
         e.preventDefault()
-        setIsCountryValue("")
+
+        if (countryList.includes(countryName.trim())) {
+            alert("Country already exists!")
+            return
+        }
+
+        setCountryList([...countryList, countryName.trim()])
+        setCountryName("")
         setIsFormOpen(false)
-        isCountryList.push(isCountryValue)
     }
 
-    const handleRedirect = (_id) => {
-        navigate(`/state/${_id}`);
+    const handleDeleteCountry = (countryName) => {
+        const confirmDelete = window.confirm("Are you sure you want to delete this country?")
+        if (confirmDelete) {
+            const filteredList = countryList.filter(country => country !== countryName)
+            setCountryList(filteredList)
+        }
     }
 
-    const handleCountryDelete = (countryName) => {
-        alert("Are You want to Delete this country")
-        isCountryList?.filter((country) => country !== countryName)
+    const handleNavigateToState = (countryIndex) => {
+        navigate(`/state/${countryIndex}`)
     }
 
     return (
-        <>
+        <div>
             {!isFormOpen && <button onClick={() => setIsFormOpen(true)}>Add Country</button>}
             {isFormOpen &&
                 <form onSubmit={handleAddCountry}>
                     <label>Country name</label>
-                    <input onChange={(e) => {
-                        setIsCountryValue(e.target.value)
-                    }} value={isCountryValue} />
-                    <button>Submit</button>
-                </form>}
-            {isCountryList.length > 0 && <table>
-                <tr>
-                    <th>S No</th>
-                    <th>Country Name</th>
-                    <th>Edit</th>
-                    <th>Delete</th>
-                    <th>State</th>
-                </tr>
-                {isCountryList?.map((data, index) => {
-                    return (
+                    <input
+                        value={countryName}
+                        // onChange={(e) => setCountryName(e.target.value)}
+                        onChange={(e) => {
+                            const value = e.target.value;
+                            if (value.startsWith(" ")) return;
+                            setCountryName(value);
+                        }}
+                        required
+                    />
+                    <button type="submit">Submit</button>
+                </form>
+            }
+
+            {countryList.length > 0 && (
+                <table border="1">
+                    <thead>
                         <tr>
-                            <td>{index + 1}</td>
-                            <td>{data}</td>
-                            <td><button>Edit Country</button></td>
-                            <td><button onClick={() => { handleCountryDelete(data) }}>Delete Country</button></td>
-                            <td><button onClick={() => { handleRedirect(index + 1) }}>State List</button></td>
+                            <th>S No</th>
+                            <th>Country Name</th>
+                            <th>Delete</th>
+                            <th>States</th>
                         </tr>
-                    )
-                })}
-            </table>}
-        </>
+                    </thead>
+                    <tbody>
+                        {countryList.map((country, index) => (
+                            <tr key={index}>
+                                <td>{index + 1}</td>
+                                <td>{country}</td>
+                                <td>
+                                    <button onClick={() => handleDeleteCountry(country)}>Delete</button>
+                                </td>
+                                <td>
+                                    <button onClick={() => handleNavigateToState(index)}>Manage States</button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            )}
+        </div>
     )
 }
 

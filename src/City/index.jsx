@@ -1,48 +1,75 @@
-import { useState } from "react"
+import React, { useState } from "react"
+import { useNavigate } from "react-router-dom"
 
 const CityList = () => {
-    const [isCountryValue, setIsCountryValue] = useState("")
-    const [isCountryList, setIsCountryList] = useState([])
-    const [isFormOpen, setIsFormOpen] = useState(false)
+    const navigate = useNavigate()
 
+    const [cityName, setCityName] = useState("")
+    const [cityList, setCityList] = useState([])
 
-    const handleAddCountry = (e) => {
+    const handleAddCity = (e) => {
         e.preventDefault()
-        setIsCountryValue("")
-        setIsFormOpen(false)
-        isCountryList.push(isCountryValue)
+
+        if (cityList.includes(cityName.trim())) {
+            alert("City already exists!")
+            return
+        }
+
+        setCityList([...cityList, cityName.trim()])
+        setCityName("")
     }
 
+    const handleDeleteCity = (cityToDelete) => {
+        const confirmDelete = window.confirm("Are you sure you want to delete this city?")
+        if (confirmDelete) {
+            const updatedList = cityList.filter(city => city !== cityToDelete)
+            setCityList(updatedList)
+        }
+    }
+
+    // console.log(cityList,"cityList");
+
     return (
-        <>
-            {!isFormOpen && <button onClick={() => setIsFormOpen(true)}>Add Country</button>}
-            {isFormOpen &&
-                <form onSubmit={handleAddCountry}>
-                    <label>Country name</label>
-                    <input onChange={(e) => {
-                        setIsCountryValue(e.target.value)
-                    }} value={isCountryValue} />
-                    <button>Submit</button>
-                </form>}
-            {isCountryList.length > 0 && <table>
-                <tr>
-                    <th>S No</th>
-                    <th>Country Name</th>
-                    <th>Edit</th>
-                    <th>Delete</th>
-                </tr>
-                {isCountryList?.map((data, index) => {
-                    return (
+        <div>
+            <button onClick={() => navigate(-1)}>Go to State List</button>
+            <form onSubmit={handleAddCity}>
+                <label>City name</label>
+                <input
+                    value={cityName}
+                    // onChange={(e) => setCityName(e.target.value)}
+                    onChange={(e) => {
+                        const value = e.target.value;
+                        if (value.startsWith(" ")) return;
+                        setCityName(value);
+                    }}
+                    required
+                />
+                <button type="submit">Add City</button>
+            </form>
+
+            {cityList.length > 0 && (
+                <table border="1">
+                    <thead>
                         <tr>
-                            <td>{index + 1}</td>
-                            <td>{data}</td>
-                            <td><button>Edit Country</button></td>
-                            <td><button>Delete Country</button></td>
+                            <th>S No</th>
+                            <th>City Name</th>
+                            <th>Delete</th>
                         </tr>
-                    )
-                })}
-            </table>}
-        </>
+                    </thead>
+                    <tbody>
+                        {cityList.map((city, index) => (
+                            <tr key={index}>
+                                <td>{index + 1}</td>
+                                <td>{city}</td>
+                                <td>
+                                    <button onClick={() => handleDeleteCity(city)}>Delete</button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            )}
+        </div>
     )
 }
 
